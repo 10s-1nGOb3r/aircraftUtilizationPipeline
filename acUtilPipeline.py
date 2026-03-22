@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 
+#First step as usual, make file directory using os library
 script_dir = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(script_dir,"input","dfsAcUtil.csv")
 save_at = os.path.join(script_dir, "output", "detailUtilReport.csv")
@@ -15,8 +16,16 @@ save_at8 = os.path.join(script_dir, "output", "utilReportPerDayPerRegistration.c
 save_at9 = os.path.join(script_dir, "output", "utilReportPerMonthPerRegistration.csv")
 save_at10 = os.path.join(script_dir, "output", "utilReportPerYearPerRegistration.csv")
 
+#Read the files on input files
+#The required field on AIMS 1.2.1. Daily Flight Schedule such as
+#DATE,FLT,TYPE,REG,AC,DEP,ARR
+#STD,STA,ATD,ATA,BLOCK
 df = pd.read_csv(file_path,sep=";")
 
+#Data formatting on some fields such as
+#DATE,FLT,REG,AC,DEP,ARR,BLOCK
+#Also some calculated fields are being made such as
+#monthName,monthNumber,year,dayCount,blockDec,acCount
 df["DATE"] = pd.to_datetime(df["DATE"],format="%d/%m/%Y")
 df["monthName"] = df["DATE"].dt.month_name()
 df["monthNumber"] = df["DATE"].dt.month
@@ -36,6 +45,10 @@ df["blockDec"] = df["blockDec"].fillna(0)
 df["acCount"] = np.where(df["REG"] != df["REG"].shift(1),1,0)
 df["acCount"] = df["acCount"].astype(int)
 
+#Aggregations are being made based on several requirements such as
+#Utilization Per Day, Per Month, Per Year
+#Utilization Per Aircraft Type Per Day, Per Month, Per Year
+#Utilization Per Aircraft Registration Per Day, Per Month, Per Year
 df2 = df.groupby(["year","monthNumber","monthName","DATE"]).agg(
     totalBlockDec = ("blockDec","sum"),
     totalAcOnline = ("acCount","sum"),
@@ -224,6 +237,7 @@ for source_col, new_col in collection10.items():
     df10[new_col] = hours.astype(str) + "h " + minutes.astype(str).str.zfill(2) + "m"
 df10 = df10.sort_values(by=["year","AC","utilDec"],ascending=[False,False,False])
 
+#Exporting utilization report into csv files on output folder
 df.to_csv(save_at,sep=";",index=False)
 df2.to_csv(save_at2,sep=";",index=False)
 df3.to_csv(save_at3,sep=";",index=False)
