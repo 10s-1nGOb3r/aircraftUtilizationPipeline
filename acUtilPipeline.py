@@ -11,6 +11,9 @@ save_at4 = os.path.join(script_dir, "output", "utilReportPerMonth.csv")
 save_at5 = os.path.join(script_dir, "output", "utilReportPerMonthPerAircraft.csv")
 save_at6 = os.path.join(script_dir, "output", "utilReportPerYear.csv")
 save_at7 = os.path.join(script_dir, "output", "utilReportPerYearPerAircraft.csv")
+save_at8 = os.path.join(script_dir, "output", "utilReportPerDayPerRegistration.csv")
+save_at9 = os.path.join(script_dir, "output", "utilReportPerMonthPerRegistration.csv")
+save_at10 = os.path.join(script_dir, "output", "utilReportPerYearPerRegistration.csv")
 
 df = pd.read_csv(file_path,sep=";")
 
@@ -162,6 +165,65 @@ for source_col, new_col in collection7.items():
     minutes = (total_minutes % 60).astype("Int64")
     df7[new_col] = hours.astype(str) + "h " + minutes.astype(str).str.zfill(2) + "m"
 
+df8 = df.groupby(["year","monthNumber","monthName","DATE","AC","REG"]).agg(
+    totalBlockDec = ("blockDec","sum"),
+    totalAcOnline = ("acCount","sum")
+).reset_index()
+df8["totalBlockDec"] = df8["totalBlockDec"].astype(float)
+df8["totalBlockDec"] = df8["totalBlockDec"].round(2)
+df8["totalDay"] = np.where(df8["totalBlockDec"] > 0,1,0)
+df8["utilDec"] = (df8["totalBlockDec"] / df8["totalAcOnline"]) / df8["totalDay"]
+df8["utilDec"] = df8["utilDec"].astype(float)
+df8["utilDec"] = df8["utilDec"].round(2)
+collection8 = {
+        "utilDec": "utilHR:MM",
+        "totalBlockDec": "totalBlockHR:MM"
+}
+for source_col, new_col in collection8.items():
+    total_minutes = (df8[source_col] * 60).round()
+    hours = (total_minutes // 60).astype(int)
+    minutes = (total_minutes % 60).astype(int)
+    df8[new_col] = hours.astype(str) + "h " + minutes.astype(str).str.zfill(2) + "m"
+
+df9 = df8.groupby(["year","monthNumber","monthName","AC","REG"]).agg(
+    totalBlockDec = ("totalBlockDec","sum"),
+    totalAcOnline = ("totalAcOnline","sum")
+).reset_index()
+df9["totalBlockDec"] = df9["totalBlockDec"].astype(float)
+df9["totalBlockDec"] = df9["totalBlockDec"].round(2)
+df9["utilDec"] = df9["totalBlockDec"] / df9["totalAcOnline"]
+df9["utilDec"] = df9["utilDec"].astype(float)
+df9["utilDec"] = df9["utilDec"].round(2)
+collection9 = {
+        "utilDec": "utilHR:MM",
+        "totalBlockDec": "totalBlockHR:MM"
+}
+for source_col, new_col in collection9.items():
+    total_minutes = (df9[source_col] * 60).round()
+    hours = (total_minutes // 60).astype(int)
+    minutes = (total_minutes % 60).astype(int)
+    df9[new_col] = hours.astype(str) + "h " + minutes.astype(str).str.zfill(2) + "m"
+
+df10 = df9.groupby(["year","AC","REG"]).agg(
+    totalBlockDec = ("totalBlockDec","sum"),
+    totalAcOnline = ("totalAcOnline","sum")
+).reset_index()
+df10["totalBlockDec"] = df10["totalBlockDec"].astype(float)
+df10["totalBlockDec"] = df10["totalBlockDec"].round(2)
+df10["utilDec"] = df10["totalBlockDec"] / df10["totalAcOnline"]
+df10["utilDec"] = df10["utilDec"].astype(float)
+df10["utilDec"] = df10["utilDec"].round(2)
+collection10 = {
+        "utilDec": "utilHR:MM",
+        "totalBlockDec": "totalBlockHR:MM"
+}
+for source_col, new_col in collection10.items():
+    total_minutes = (df10[source_col] * 60).round()
+    hours = (total_minutes // 60).astype(int)
+    minutes = (total_minutes % 60).astype(int)
+    df10[new_col] = hours.astype(str) + "h " + minutes.astype(str).str.zfill(2) + "m"
+df10 = df10.sort_values(by=["year","AC","utilDec"],ascending=[False,False,False])
+
 df.to_csv(save_at,sep=";",index=False)
 df2.to_csv(save_at2,sep=";",index=False)
 df3.to_csv(save_at3,sep=";",index=False)
@@ -169,3 +231,6 @@ df4.to_csv(save_at4,sep=";",index=False)
 df5.to_csv(save_at5,sep=";",index=False)
 df6.to_csv(save_at6,sep=";",index=False)
 df7.to_csv(save_at7,sep=";",index=False)
+df8.to_csv(save_at8,sep=";",index=False)
+df9.to_csv(save_at9,sep=";",index=False)
+df10.to_csv(save_at10,sep=";",index=False)
