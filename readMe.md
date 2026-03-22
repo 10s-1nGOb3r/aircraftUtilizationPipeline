@@ -16,25 +16,36 @@ The output is exported into multiple .csv files for reporting and analysis.
 📂 Project Structure
 
 project/
-│
-├── input/
-│   └── dfsAcUtil.csv
-│
-├── output/
-│   ├── detailUtilReport.csv
-│   ├── utilReportPerDay.csv
-│   ├── utilReportPerDayPerAircraft.csv
-│   ├── utilReportPerMonth.csv
-│   ├── utilReportPerMonthPerAircraft.csv
-│   ├── utilReportPerYear.csv
-│   ├── utilReportPerYearPerAircraft.csv
-│   ├── utilReportPerDayPerRegistration.csv
-│   ├── utilReportPerMonthPerRegistration.csv
-│   └── utilReportPerYearPerRegistration.csv
-│
-├── acUtilPipeline.py
-│
-└── runAcUtilPipeline.bat
+
+  input/
+
+    dfsAcUtil.csv
+
+  output/
+
+    detailUtilReport.csv  
+    
+    utilReportPerDay.csv
+
+    utilReportPerDayPerAircraft.csv
+    
+    utilReportPerMonth.csv
+
+    utilReportPerMonthPerAircraft.csv
+
+    utilReportPerYear.csv
+
+    utilReportPerYearPerAircraft.csv
+
+    utilReportPerDayPerRegistration.csv
+
+    utilReportPerMonthPerRegistration.csv
+
+    utilReportPerYearPerRegistration.csv
+  
+  acUtilPipeline.py
+
+  runAcUtilPipeline.bat
 
 📥 Input Data Requirements
 
@@ -119,11 +130,15 @@ Fleet utilization monitoring
 Airline operational performance tracking
 Aircraft productivity analysis
 Input for forecasting models (e.g., block hours prediction)
+
+
 ⚠️ Notes & Assumptions
 Only scheduled flights should be included unless adjusted
 BLOCK must be in HH:MM format
 Aircraft count is derived from registration change logic
 Missing or invalid block times are treated as 0
+
+
 🧠 Future Improvements
 Add visualization (Matplotlib / Power BI integration)
 Support real-time data ingestion
